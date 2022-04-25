@@ -6,10 +6,18 @@
 
 char __license[] SEC("license") = "Dual MIT/GPL";
 
+struct bpf_map_def SEC("maps") xdp_map = {
+    .type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(__u32),
+	.value_size = sizeof(int),
+	.max_entries = 1000,
+};
+
 SEC("xdp")
-int prog(struct xdp_md *ctx) {
+int xdp_prog(struct xdp_md *ctx) {
     void *data_end = (void *)(long)ctx->data_end;
     void *data = (void *)(long)ctx->data;
+    int *value;
     struct ethhdr *eth = data;
     __u64 nh_off = sizeof(*eth);
 
@@ -25,6 +33,8 @@ int prog(struct xdp_md *ctx) {
     
     __u32 protocol = iph->protocol;
     if (protocol == 1) {
+        value = bpf_map_lookup_elem(&xdp_map, &protocol);
+        *value++;
         return XDP_DROP;
     }
 

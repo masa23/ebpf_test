@@ -52,13 +52,14 @@ type xdpSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type xdpProgramSpecs struct {
-	Prog *ebpf.ProgramSpec `ebpf:"prog"`
+	XdpProg *ebpf.ProgramSpec `ebpf:"xdp_prog"`
 }
 
 // xdpMapSpecs contains maps before they are loaded into the kernel.
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type xdpMapSpecs struct {
+	XdpMap *ebpf.MapSpec `ebpf:"xdp_map"`
 }
 
 // xdpObjects contains all objects after they have been loaded into the kernel.
@@ -80,22 +81,25 @@ func (o *xdpObjects) Close() error {
 //
 // It can be passed to loadXdpObjects or ebpf.CollectionSpec.LoadAndAssign.
 type xdpMaps struct {
+	XdpMap *ebpf.Map `ebpf:"xdp_map"`
 }
 
 func (m *xdpMaps) Close() error {
-	return _XdpClose()
+	return _XdpClose(
+		m.XdpMap,
+	)
 }
 
 // xdpPrograms contains all programs after they have been loaded into the kernel.
 //
 // It can be passed to loadXdpObjects or ebpf.CollectionSpec.LoadAndAssign.
 type xdpPrograms struct {
-	Prog *ebpf.Program `ebpf:"prog"`
+	XdpProg *ebpf.Program `ebpf:"xdp_prog"`
 }
 
 func (p *xdpPrograms) Close() error {
 	return _XdpClose(
-		p.Prog,
+		p.XdpProg,
 	)
 }
 
