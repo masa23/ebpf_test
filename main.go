@@ -1,9 +1,11 @@
-//go:build amd64 && linux
-// +build amd64,linux
+//go:build linux
+// +build linux
 
 package main
 
 import (
+	"encoding/binary"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,12 +45,39 @@ func main() {
 
 	go func() {
 		for {
+			/*
+				var count uint32
+				m := objs.xdpMaps.XdpMap
+				m.Lookup(uint32(1), &count)
+				pp.Println(count)
+				m.Delete(uint32(1))
+				pp.Println(err)
+				pp.Println(m)
+			*/
+			var key uint32
 			var count uint32
 			m := objs.xdpMaps.XdpMap
-			m.Lookup(uint32(1), &count)
-			pp.Println(count)
-			m.Delete(uint32(1))
-			pp.Println(err)
+			err := m.NextKey(nil, &key)
+			if err != nil {
+				time.Sleep(time.Second)
+				continue
+			}
+			for i := 0; i <= int(m.MaxEntries()); i++ {
+				err = m.Lookup(key, &count)
+				if err != nil {
+					break
+				}
+				ipaddr := make(net.IP, 4)
+				binary.LittleEndian.PutUint32(ipaddr, key)
+				pp.Println(ipaddr.String(), count)
+				oldKey := key
+				err := m.NextKey(oldKey, &key)
+				if err != nil {
+					time.Sleep(time.Second)
+					break
+				}
+			}
+
 			time.Sleep(time.Second)
 		}
 	}()

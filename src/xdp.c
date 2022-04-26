@@ -10,7 +10,7 @@ struct bpf_map_def SEC("maps") xdp_map = {
     .type = BPF_MAP_TYPE_HASH,
 	.key_size = sizeof(__u32),
 	.value_size = sizeof(__u32),
-	.max_entries = 4,
+	.max_entries = 1000,
     .map_flags = 0
 };
 
@@ -35,10 +35,10 @@ int xdp_prog(struct xdp_md *ctx) {
     
     __u32 protocol = iph->protocol;
     if (protocol == 1) {
-        value = bpf_map_lookup_elem(&xdp_map, &protocol);
+        value = bpf_map_lookup_elem(&xdp_map, &iph->saddr);
         if(!value){
-            bpf_map_update_elem(&xdp_map, &protocol, &zero, BPF_NOEXIST);
-            value = bpf_map_lookup_elem(&xdp_map, &protocol);
+            bpf_map_update_elem(&xdp_map, &iph->saddr, &zero, BPF_NOEXIST);
+            value = bpf_map_lookup_elem(&xdp_map, &iph->saddr);
             if(!value) {
                 return XDP_PASS;
             }
