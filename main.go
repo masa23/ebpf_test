@@ -41,22 +41,19 @@ func main() {
 		panic(err)
 	}
 
-	count := make([]byte, 4)
 	go func() {
 		for {
+			var count uint32
 			m := objs.xdpMaps.XdpMap
-			pp.Println(m)
-			err := m.Lookup(uint32(1), &count)
-			pp.Println(err, count)
+			m.Lookup(uint32(1), &count)
+			pp.Println(count)
+			m.Delete(uint32(1))
+			pp.Println(err)
 			time.Sleep(time.Second)
 		}
 	}()
 
 	<-sig
-	/*
-		if err := os.RemoveAll(tmpdir); err != nil {
-			panic(err)
-		}*/
 	if err := netlink.LinkSetXdpFd(link, -1); err != nil {
 		panic(err)
 	}
