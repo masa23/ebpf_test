@@ -1,3 +1,5 @@
 .vscode
 ebpf*
+xdp/xdb
+tc/tc
 *.o
