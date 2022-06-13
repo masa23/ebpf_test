@@ -41,11 +41,11 @@ int tc(struct __sk_buff *skb)
             //bpf_printk("icmp!");
         }
         // value = bpf_map_lookup_elem(&xdp_map, &iph->saddr);
-        value = bpf_map_lookup_elem(&tc_map, &iph->saddr);
+        value = bpf_map_lookup_elem(&tc_map, &iph->daddr);
         if (!value)
         {
-            bpf_map_update_elem(&tc_map, &iph->saddr, &zero, BPF_NOEXIST);
-            value = bpf_map_lookup_elem(&tc_map, &iph->saddr);
+            bpf_map_update_elem(&tc_map, &iph->daddr, &zero, BPF_NOEXIST);
+            value = bpf_map_lookup_elem(&tc_map, &iph->daddr);
             if (!value)
             {
                 return TC_ACT_OK;

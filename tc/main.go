@@ -5,6 +5,7 @@ package main
 
 import (
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -27,7 +28,10 @@ type Collect struct {
 }
 
 func main() {
-	var iface string = "enp1s0"
+	var iface string
+	flag.StringVar(&iface, "iface", "enp1s0", "summrize interface")
+	flag.Parse()
+
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -44,7 +48,7 @@ func main() {
 
 	qdisc := &netlink.GenericQdisc{
 		QdiscAttrs: attrs,
-		QdiscType:  "clsact",
+		QdiscType:  "ingress",
 	}
 
 	objs := tcObjects{}
@@ -80,15 +84,6 @@ func main() {
 
 	go func() {
 		for {
-			/*
-				var count uint32
-				m := objs.xdpMaps.XdpMap
-				m.Lookup(uint32(1), &count)
-				pp.Println(count)
-				m.Delete(uint32(1))
-				pp.Println(err)
-				pp.Println(m)
-			*/
 			var key uint32
 			var count uint64
 			m := objs.tcMaps.TcMap
