@@ -2,4 +2,5 @@
 ebpf*
 xdp/xdb
 tc/tc
+ipv6/ipv6
 *.o
