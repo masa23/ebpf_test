@@ -3,7 +3,7 @@
 ## インストール
 
 ```
-# apt install build-essential clang llvm
+# apt install build-essential clang llvm gcc-multilib
 ```
 
 ## ビルド
@@ -11,3 +11,4 @@
 ```
 # make
 ```
+
